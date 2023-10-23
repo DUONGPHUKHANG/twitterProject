@@ -4,7 +4,7 @@ config()
 
 // hàm kí tên
 export const signToken = ({
-  payload,
+  payload, //data
   privateKey = process.env.JWT_SECRET as string,
   options = { algorithm: 'HS256' }
 }: {

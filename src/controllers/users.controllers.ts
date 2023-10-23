@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import userService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { RegisterReqBody } from '~/models/requests/User.request'
@@ -19,13 +19,16 @@ export const loginController = (req: Request, res: Response) => {
     })
   }
 }
-export const registerController = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response) => {
-  // const { email, password, name } = req.body thay thế bằng RegisterReqBody
-  try {
-    // tạo 1 user mới bỏ vào collection users trong database
-    const result = await userService.register(req.body)
-    return res.json({ message: 'thêm ngon lành', result })
-  } catch (err) {
-    res.status(400).json({ message: 'Sai ròi má ơi', err })
-  }
+export const registerController = async (
+  req: Request<ParamsDictionary, any, RegisterReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  // throw new Error('tạo thử 1 cái lỗi nè')
+  const result = await userService.register(req.body) // thay luôn
+  console.log(result)
+  return res.status(400).json({
+    message: 'Register success',
+    result: result
+  })
 }

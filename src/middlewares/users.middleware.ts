@@ -7,6 +7,7 @@ import { checkSchema } from 'express-validator'
 import { Response, Request, NextFunction } from 'express'
 import { validate } from '~/utils/validation'
 import userService from '~/services/users.services'
+import { ErrorWithStatus } from '~/models/schemas/Errors'
 
 //viết 1 middleware xử lý validator login
 export const loginValidator = (req: Request, res: Response, next: NextFunction) => {
@@ -48,7 +49,7 @@ export const registerValidator = validate(
         options: async (value, { req }) => {
           const isExistEmail = await userService.checkEmail(value)
           if (isExistEmail) {
-            throw new Error('Email already exist')
+            throw new Error('Email already exists')
           }
           return true
         }
