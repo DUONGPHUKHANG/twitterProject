@@ -11,6 +11,10 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
     await validation.run(req)
 
     const errors = validationResult(req)
+
+    if (errors.isEmpty()) {
+      return next()
+    }
     const errorObject = errors.mapped() //hàm này giúp ta lấy lỗi ra dưới dạng object
     const entityError = new EntityError({ errors: {} })
 
@@ -31,10 +35,7 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
       entityError.errors[key] = msg
     }
     // sau khi duyệt xog thì thêm cho defaultErrorHandler xử lý
-    if (errors.isEmpty()) {
-      return next()
-    }
-    res.status(422).json({ errors: errorObject })
+    next(entityError)
   }
 }
 // mapped trả về lỗi có format đẹp hơn thằng array
