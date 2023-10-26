@@ -1,6 +1,6 @@
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
-
+//Errors lưu định ngĩa lỗi
 type ErrorsType = Record<
   string,
   {
