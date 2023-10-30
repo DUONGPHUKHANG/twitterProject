@@ -1,6 +1,12 @@
 import { Router } from 'express'
-import { loginController, registerController } from '~/controllers/users.controllers'
-import { loginValidator, registerValidator } from '~/middlewares/users.middleware'
+import { loginController, logoutController, registerController } from '~/controllers/users.controllers'
+import {
+  RefreshTokenValidator,
+  accessTokenValidator,
+  loginValidator,
+  registerValidator
+} from '~/middlewares/users.middleware'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { wrapAsync } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -17,15 +23,13 @@ usersRouter.post(
   // --> bản chất middleware và controller giống nhau
   // hàm err là hàm tập kết lỗi
 )
-
-usersRouter.get('/tweets', (req, res) => {
-  res.json({
-    data: [
-      { fname: 'Điệp', yob: 1999 },
-      { fname: 'Hùng', yob: 2003 },
-      { fname: 'Được', yob: 1994 }
-    ]
-  })
-})
+/*
+des: đăng xuất
+path: /users/logout
+method: POST
+Header: (Authorization: 'Bearer <access_token>')
+body: {refresh_token: string}
+*/
+usersRouter.post('/logout', accessTokenValidator, RefreshTokenValidator, wrapAsync(logoutController))
 
 export default usersRouter

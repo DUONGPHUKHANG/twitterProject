@@ -7,6 +7,7 @@ import { TokenType } from '~/constants/enums'
 import { config } from 'dotenv'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
+import { USERS_MESSAGES } from '~/constants/messages'
 config
 
 class UserService {
@@ -40,7 +41,7 @@ class UserService {
     // từ user_id tạo 1 accessToken và 1 refreshToken
 
     const [access_Token, refresh_token] = await this.signAccessAndRefresh(user_id)
-    databaseService.refreshTokens.insertOne(
+    await databaseService.refreshTokens.insertOne(
       new RefreshToken({
         token: refresh_token,
         user_id: new ObjectId(user_id)
@@ -56,7 +57,21 @@ class UserService {
   async login(user_id: string) {
     // dùng cái user_id đó tạo access_token và refresh_token
     const [access_Token, refresh_token] = await this.signAccessAndRefresh(user_id)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: refresh_token,
+        user_id: new ObjectId(user_id)
+      })
+    )
     return { access_Token, refresh_token }
+  }
+
+  async logout(refresh_Token: string) {
+    // dùng refresh
+    await databaseService.refreshTokens.deleteOne({ token: refresh_Token })
+    return {
+      message: USERS_MESSAGES.LOGOUT_SUCCESS
+    }
   }
 }
 const userService = new UserService()
