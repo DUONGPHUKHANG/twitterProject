@@ -6,12 +6,12 @@ config()
 // hàm kí tên
 export const signToken = ({
   payload, //data
-  privateKey = process.env.JWT_SECRET as string,
+  privateKey,
   options = { algorithm: 'HS256' }
 }: {
   payload: string | object | Buffer
   // có dấu chấm ? là ko bắt buộc pải có | còn ko thì bắt buộc
-  privateKey?: string
+  privateKey: string
   options?: jwt.SignOptions
 }) => {
   return new Promise<string>((resolve, reject) => {
@@ -21,13 +21,7 @@ export const signToken = ({
     })
   })
 }
-export const verifyToken = ({
-  token,
-  secretOrPublicKey = process.env.JWT_SECRET as string
-}: {
-  token: string
-  secretOrPublicKey?: string
-}) => {
+export const verifyToken = ({ token, secretOrPublicKey }: { token: string; secretOrPublicKey: string }) => {
   //trả về JwtPayload(thông tin người gữi req) nếu token hợp lệ
   return new Promise<TokenPayload>((resolve, reject) => {
     //method này sẽ verify token, nếu token hợp lệ thì nó sẽ trả về payload
@@ -41,3 +35,5 @@ export const verifyToken = ({
     })
   })
 }
+// access truyền vào Authorization -> Bearer Token
+//  còn refreshToken thì được truyền vào body
