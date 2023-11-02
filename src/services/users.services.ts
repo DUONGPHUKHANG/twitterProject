@@ -8,6 +8,8 @@ import { config } from 'dotenv'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
 import { USERS_MESSAGES } from '~/constants/messages'
+import { ErrorWithStatus } from '~/models/schemas/Errors'
+import HTTP_STATUS from '~/constants/httpStatus'
 config
 
 class UserService {
@@ -62,7 +64,8 @@ class UserService {
         _id: user_id,
         email_verify_token,
         date_of_birth: new Date(payload.date_of_birth),
-        password: hashPwd(payload.password)
+        password: hashPwd(payload.password),
+        username: `user${user_id.toString()}`
       })
     )
     // từ user_id tạo 1 accessToken và 1 refreshToken
@@ -226,6 +229,28 @@ class UserService {
       }
     )
     return user.value //đây là document sau khi update
+  }
+  async getProfile(username: string) {
+    const user = await databaseService.users.findOne(
+      { username: username },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify: 0,
+          create_at: 0,
+          update_at: 0
+        }
+      }
+    )
+    if (user == null) {
+      throw new ErrorWithStatus({
+        message: USERS_MESSAGES.USER_NOT_FOUND,
+        status: HTTP_STATUS.NOT_FOUND
+      })
+    }
+    return user
   }
 }
 //trong dó projection giúp ta loại bỏ lấy về các thuộc tính như password, email_verify_token, forgot_password_token
